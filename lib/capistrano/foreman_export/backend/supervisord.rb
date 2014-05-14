@@ -1,6 +1,6 @@
 
 module Capistrano
-  module Foreman
+  module ForemanExport
     module Backend
       class Supervisord
 

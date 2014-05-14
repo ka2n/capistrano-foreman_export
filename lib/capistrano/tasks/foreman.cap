@@ -1,8 +1,8 @@
-require 'capistrano/foreman/backend'
+require 'capistrano/foreman_export/backend'
 
 namespace :load do
   task :defaults do
-    set :foreman_backend, Capistrano::Foreman::Backend::Supervisord
+    set :foreman_backend, Capistrano::ForemanExport::Backend::Supervisord
     set :foreman_roles, :app
     set :foreman_port, 5000
     set :foreman_root, -> { release_path }

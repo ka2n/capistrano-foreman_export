@@ -1,5 +1,5 @@
 module Capistrano
-  module Foreman
+  module ForemanExport
     VERSION = "0.0.1"
   end
 end

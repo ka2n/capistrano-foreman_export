@@ -1,4 +1,4 @@
-# Capistrano::Foreman
+# Capistrano::ForemanExport
 
 Capistrano task for foreman. Supervisord is supported.
 Export supervisord configuration from Procfile using `foreman export`. 
@@ -7,7 +7,7 @@ Export supervisord configuration from Procfile using `foreman export`.
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano-foreman'
+    gem 'capistrano-foreman_export'
 
 And then execute:
 
@@ -15,14 +15,14 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install capistrano-foreman
+    $ gem install capistrano-foreman_export
 
 
 ## Usage
 
 Add this line to your `Capfile`:
 
-    require 'capistrano/foreman'
+    require 'capistrano/foreman_export'
 
 If you want to restart the application after deploy, add this line to your `config/deploy.rb`:
 
@@ -31,7 +31,7 @@ If you want to restart the application after deploy, add this line to your `conf
 
 Configurable options:
 
-    set :foreman_backend, Capistrano::Foreman::Backend::Supervisord
+    set :foreman_backend, Capistrano::ForemanExport::Backend::Supervisord
     set :foreman_roles, :app
     set :foreman_port, 5000
     set :foreman_output, '/etc/supervisor.d'

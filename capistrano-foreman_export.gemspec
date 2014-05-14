@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'capistrano/foreman/version'
+require 'capistrano/foreman_export/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "capistrano-foreman"
-  spec.version       = Capistrano::Foreman::VERSION
+  spec.name          = "capistrano-foreman_export"
+  spec.version       = Capistrano::ForemanExport::VERSION
   spec.authors       = ["Katsuma Ito"]
   spec.email         = ["katsumai@gmail.com"]
   spec.description   = %q{Capistrano task for foreman}
