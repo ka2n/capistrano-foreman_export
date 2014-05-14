@@ -1,0 +1,77 @@
+require 'capistrano/foreman/backend'
+
+namespace :load do
+  task :defaults do
+    set :foreman_backend, Capistrano::Foreman::Backend::Supervisord
+    set :foreman_roles, :app
+    set :foreman_port, 5000
+    set :foreman_root, -> { release_path }
+    set :foreman_app, -> { fetch(:application) }
+    set :foreman_procfile, -> { release_path.join('Procfile') }
+    set :foreman_log, -> { release_path.join('log') }
+    set :foreman_user, 'nginx'
+    set :foreman_env_variables, {}
+    set :foreman_output, '/etc/supervisor.d'
+  end
+end
+
+namespace :foreman do
+
+    desc "export"
+    task :export do
+      on roles(fetch(:foreman_roles)) do
+        within release_path do
+          invoke 'foreman:export_env_variables'
+          execute :sudo, "touch #{release_path}/.env"
+          options = []
+          options << "--port #{fetch(:foreman_port)}" if fetch(:foreman_port)
+          options << "--root #{fetch(:foreman_root)}" if fetch(:foreman_root)
+          options << "--app #{fetch(:foreman_app)}" if fetch(:foreman_app)
+          options << "--procfile #{fetch(:foreman_procfile)}" if fetch(:foreman_procfile)
+          options << "--log #{fetch(:foreman_log)}" if fetch(:foreman_log)
+          options << "--user #{fetch(:foreman_user)}" if fetch(:foreman_user)
+          options << "--env #{release_path.join('.env')},#{env_variable_path}"
+          execute :sudo, [ "env PATH=$PATH", "bundle exec", 
+            "foreman export", backend.name, fetch(:foreman_output), options
+          ]
+        end
+      end
+    end
+
+    task :export_env_variables do
+      on roles(fetch(:foreman_roles)) do
+        envs = fetch(:foreman_env_variables).map {|k,v| %(#{k.upcase}=#{v}) }.join("\n")
+        envfile = StringIO.new(envs)
+        upload! envfile, env_variable_path
+      end
+    end
+
+    desc "start"
+    task :start do
+      on roles(fetch(:foreman_roles)) do
+        execute :sudo, backend.start_cmd(fetch(:foreman_app))
+      end
+    end
+
+    desc "stop"
+    task :stop do
+      on roles(fetch(:foreman_roles)) do
+        execute :sudo, backend.stop_cmd(fetch(:foreman_app))
+      end
+    end
+
+    desc "restart"
+    task :restart do
+      on roles(fetch(:foreman_roles)) do
+        execute :sudo, backend.restart_cmd(fetch(:foreman_app))
+      end
+    end
+end
+
+def backend
+  @backend ||= fetch(:foreman_backend).new
+end
+
+def env_variable_path
+  shared_path.join('RUNTIME_ENV')
+end
