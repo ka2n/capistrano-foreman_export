@@ -1,44 +1,48 @@
 
+
 module Capistrano
   module ForemanExport
     module Backend
       class Supervisord
 
+        def initialize(task)
+          @task = task
+        end
+
         def name
           "supervisord"
         end
 
-        def start_cmd(app_name)
-          wrap_bash <<-CMD
-          #{shell_add_if_new(app_name)}
-          supervisorctl start #{app_name}:*
-          CMD
+        def app_name
+          @task.fetch(:foreman_app)
         end
 
-        def stop_cmd(app_name)
-          wrap_bash <<-CMD
-          supervisorctl stop #{app_name}:*
-          CMD
+        def start_cmd
+          add_or_update_app
+          @task.execute(:sudo, "supervisorctl start #{app_name}:*")
         end
 
-        def restart_cmd(app_name)
-          wrap_bash <<-CMD
-          #{shell_add_if_new(app_name)}
-          supervisorctl restart #{app_name}:*
-          CMD
+        def stop_cmd
+          @task.execute(:sudo, "supervisorctl stop #{app_name}:*")
         end
 
-        def shell_add_if_new(app_name)
-          "supervisorctl reread;  sleep 3; supervisorctl status | grep -w -- '#{app_name}' | grep -qv grep || supervisorctl add #{app_name}"
+        def restart_cmd
+          add_or_update_app
+          @task.execute(:sudo, "supervisorctl restart #{app_name}:*")
         end
 
-        def wrap_bash(cmd)
-          "/bin/bash -c \"#{undent(cmd)}\""
+        def add_or_update_app
+          status = supervisord_reread
+          if status.include?("#{app_name}:")
+            if status.include('available')
+              @task.info("Configration available, add it.")
+              @task.execute(:sudo, "supervisorctl add #{app_name}")
+            end
+          end
         end
 
-        def undent(str)
-          # from https://github.com/msmorgan/homebrew/blob/master/Library/Homebrew/extend/string.rb
-          str.gsub(/^.{#{str.slice(/^ +/).length}}/, '')
+        def supervisord_reread
+          @task.capture(:sudo, %{supervisorctl reread})
         end
       end
     end

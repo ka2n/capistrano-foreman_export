@@ -49,27 +49,27 @@ namespace :foreman do
     desc "start"
     task :start do
       on roles(fetch(:foreman_roles)) do
-        execute :sudo, backend.start_cmd(fetch(:foreman_app))
+        backend.start_cmd
       end
     end
 
     desc "stop"
     task :stop do
       on roles(fetch(:foreman_roles)) do
-        execute :sudo, backend.stop_cmd(fetch(:foreman_app))
+        backend.stop_cmd
       end
     end
 
     desc "restart"
     task :restart do
       on roles(fetch(:foreman_roles)) do
-        execute :sudo, backend.restart_cmd(fetch(:foreman_app))
+        backend.restart_cmd
       end
     end
 end
 
 def backend
-  @backend ||= fetch(:foreman_backend).new
+  @backend ||= fetch(:foreman_backend).new self
 end
 
 def env_variable_path
