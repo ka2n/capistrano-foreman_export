@@ -1,4 +1,6 @@
 
+require 'capistrano/configuration'
+
 
 module Capistrano
   module ForemanExport
@@ -34,7 +36,10 @@ module Capistrano
         def add_or_update_app
           status = supervisord_reread
           if status.include?("#{app_name}:")
-            if status.include('available')
+            if status.include?('changed')
+              @task.info("Configration changed, update it.")
+              @task.execute(:sudo, "supervisorctl update #{app_name}")
+            elsif status.include('available')
               @task.info("Configration available, add it.")
               @task.execute(:sudo, "supervisorctl add #{app_name}")
             end
