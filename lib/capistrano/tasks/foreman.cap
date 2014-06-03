@@ -5,10 +5,10 @@ namespace :load do
     set :foreman_backend, Capistrano::ForemanExport::Backend::Supervisord
     set :foreman_roles, :app
     set :foreman_port, 5000
-    set :foreman_root, -> { release_path }
+    set :foreman_root, -> { current_path }
     set :foreman_app, -> { fetch(:application) }
-    set :foreman_procfile, -> { release_path.join('Procfile') }
-    set :foreman_log, -> { release_path.join('log') }
+    set :foreman_procfile, -> { current_path.join('Procfile') }
+    set :foreman_log, -> { current_path.join('log') }
     set :foreman_user, 'nginx'
     set :foreman_env_variables, {}
     set :foreman_output, '/etc/supervisor.d'
