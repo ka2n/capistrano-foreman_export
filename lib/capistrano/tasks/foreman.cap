@@ -5,10 +5,10 @@ namespace :load do
     set :foreman_backend, Capistrano::ForemanExport::Backend::Supervisord
     set :foreman_roles, :app
     set :foreman_port, 5000
-    set :foreman_root, -> { release_path }
+    set :foreman_root, -> { current_path }
     set :foreman_app, -> { fetch(:application) }
-    set :foreman_procfile, -> { release_path.join('Procfile') }
-    set :foreman_log, -> { release_path.join('log') }
+    set :foreman_procfile, -> { current_path.join('Procfile') }
+    set :foreman_log, -> { current_path.join('log') }
     set :foreman_user, 'nginx'
     set :foreman_env_variables, {}
     set :foreman_output, '/etc/supervisor.d'
@@ -49,27 +49,27 @@ namespace :foreman do
     desc "start"
     task :start do
       on roles(fetch(:foreman_roles)) do
-        execute :sudo, backend.start_cmd(fetch(:foreman_app))
+        backend.start_cmd
       end
     end
 
     desc "stop"
     task :stop do
       on roles(fetch(:foreman_roles)) do
-        execute :sudo, backend.stop_cmd(fetch(:foreman_app))
+        backend.stop_cmd
       end
     end
 
     desc "restart"
     task :restart do
       on roles(fetch(:foreman_roles)) do
-        execute :sudo, backend.restart_cmd(fetch(:foreman_app))
+        backend.restart_cmd
       end
     end
 end
 
 def backend
-  @backend ||= fetch(:foreman_backend).new
+  @backend ||= fetch(:foreman_backend).new self
 end
 
 def env_variable_path
