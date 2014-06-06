@@ -39,7 +39,7 @@ module Capistrano
             if status.include?('changed')
               @task.info("Configration changed, update it.")
               @task.execute(:sudo, "supervisorctl update #{app_name}")
-            elsif status.include('available')
+            elsif status.include?('available')
               @task.info("Configration available, add it.")
               @task.execute(:sudo, "supervisorctl add #{app_name}")
             end
